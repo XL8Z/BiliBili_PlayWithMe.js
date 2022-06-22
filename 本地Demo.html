@@ -14,14 +14,32 @@
     <meta name="author" content="[XL7Z]Ms_KuroNeko">
 
     <!-- https://github.com/h2non/jshashes -->
-    <script src="./../Lib/h2non/jshashes.min.js" type="text/javascript"></script>
+    <script src="./Lib/h2non/jshashes.min.js" type="text/javascript"></script>
     <!-- https://github.com/LinusU/decode-utf8 -->
-    <script src="./../Lib/LinusU/decode-utf8.js" type="text/javascript"></script>
+    <script src="./Lib/LinusU/decode-utf8.js" type="text/javascript"></script>
     <!-- https://github.com/XL7Z/BiliBili_PlayWithMe.js -->
-    <script src="./../Lib/PlayWithMe.js/BiLive_PlayWithMe.js" type="text/javascript"></script>
+    <script src="./Lib/PlayWithMe.js/BiLive_PlayWithMe.js" type="text/javascript"></script>
 
-    <script src="./../MyOpenLiveKey.js" type="text/javascript"></script>
+    <script src="./MyOpenLiveKey.js" type="text/javascript"></script>
 
+    <style>
+        body>div {
+            border-bottom: dotted #000;
+            border-bottom-width: .2rem;
+            margin: 1rem;
+            padding: 1rem 0;
+            width: -webkit-fill-available;
+        }
+        
+        body>div:last-child {
+            border-bottom: none;
+        }
+        
+        pre {
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
 
 <body>
@@ -39,45 +57,126 @@
     BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer = "";
 
     //绑定申请启动成功事件
+    data数据样本 = {
+        "code": 0,
+        "message": "0",
+        "request_id": "1539434929377116160",
+        "data": {
+            "anchor_info": {
+                "room_id": 4639581,
+                "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+                "uid": 3102384,
+                "uname": "猫裙少年泽远喵"
+            },
+            "game_info": {
+                "game_id": "4105b10e-9363-4311-b1ff-0f080acd9d94"
+            },
+            "websocket_info": {
+                "auth_body": "{\"roomid\":4639581,\"protover\":2,\"uid\":1081499745,\"key\":\"pafvleMbbFtPuRPOWLwF3Ak7EYTvBbigTwXs3IfQnKjmfUmb3NxbANowReJV8LEw16sSJbhLRA0yLX-8B6WqA43Ihr3xf2BuAkHqyCMztUoZwZSMVORt07Pe10e5UL3oogg5gCl0Vw1u6netdN1ryxRYa8Qf\",\"group\":\"open\"}",
+                "wss_link": ["wss://tx-bj-live-comet-01.chat.bilibili.com:443/sub", "wss://tx-gz-live-comet-04.chat.bilibili.com:443/sub", "wss://broadcastlv.chat.bilibili.com:443/sub"]
+            }
+        }
+    }
     BiLive_PlayWithMeJS.AppStarted = (data) => {
-        document.body.append("申请AppStart启动成功，触发事件BiLive_PlayWithMeJS.AppStarted，事件回调data内容如下<br/>");
-        document.body.append(JSON.stringify(data));
-        document.body.innerHTML += "<hr/>";
+        document.body.innerHTML += "<div>申请AppStart启动成功，触发事件BiLive_PlayWithMeJS.AppStarted，事件回调data内容如下<br/><pre><pre>" + JSON.stringify(data, null, 4) + "</pre></pre></div>";
     }
 
     // 绑定新弹幕事件
+    data数据样本 = {
+        "fans_medal_level": 21,
+        "fans_medal_name": "官方",
+        "fans_medal_wearing_status": false,
+        "guard_level": 0,
+        "msg": "你们谁扔个小心心呗",
+        "timestamp": 1650717881,
+        "uid": 3102384,
+        "uname": "猫裙少年泽远喵",
+        "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+        "msg_id": "eb805544-0cf2-4688-bca1-88299e5344bf",
+        "room_id": 4639581,
+        "type": "Danmaku"
+    }
     BiLive_PlayWithMeJS.NewDanmaku = (data) => {
-        document.body.append("收到一条弹幕，触发事件BiLive_PlayWithMeJS.NewDanmaku，事件回调data内容如下<br/>");
-        document.body.append(JSON.stringify(data));
-        document.body.innerHTML += "<hr/>";
+        document.body.innerHTML +=
+            "<div>收到一条弹幕，触发事件BiLive_PlayWithMeJS.NewDanmaku，事件回调data内容如下<br/><pre>" + JSON.stringify(data, null, 4) + "</pre></div>";
     }
 
     // 绑定新礼物事件
+    data数据样本 = {
+        "uid": 114439178,
+        "uname": "不忘韩文初心",
+        "uface": "http://i2.hdslb.com/bfs/face/e549b18085113c6f824c0eefaf2c9d9dcaf5a1d5.jpg",
+        "gift_id": 30607,
+        "gift_name": "小心心",
+        "gift_num": 9,
+        "price": 0,
+        "paid": false,
+        "fans_medal_level": 25,
+        "fans_medal_name": "喵小姐",
+        "guard_level": 3,
+        "timestamp": 1650717898,
+        "anchor_info": {
+            "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+            "uid": 3102384,
+            "uname": "猫裙少年泽远喵"
+        },
+        "msg_id": "e0677be6-4d08-49bc-a722-17238b0f370b",
+        "room_id": 4639581,
+        "type": "Gifts"
+    }
     BiLive_PlayWithMeJS.NewGifts = (data) => {
-        document.body.append("有人送了礼物，触发事件BiLive_PlayWithMeJS.NewGifts，事件回调data内容如下<br/>");
-        document.body.append(JSON.stringify(data));
-        document.body.innerHTML += "<hr/>";
+        document.body.innerHTML += "<div>有人送了礼物，触发事件BiLive_PlayWithMeJS.NewGifts，事件回调data内容如下<br/><pre>" + JSON.stringify(data, null, 4) + "</pre></div>";
     }
 
     // 绑定新舰长事件
+    data数据样本 = {
+        "user_info": {
+            "uid": 616066,
+            "uname": "你的魔法",
+            "uface": "http://i1.hdslb.com/bfs/face/f1d9def953795085dd42aecb2e57a08a3cdf65ac.jpg"
+        },
+        "guard_level": 3,
+        "guard_num": 1,
+        "guard_unit": "月",
+        "fans_medal_level": 0,
+        "fans_medal_name": "",
+        "fans_medal_wearing_status": false,
+        "timestamp": 1654801753,
+        "msg_id": "415d1592-9f76-4c84-9a59-4a2ee081a4dd",
+        "room_id": 4639581,
+        "guard_level_name": "舰长",
+        "type": "Guard"
+    }
     BiLive_PlayWithMeJS.NewGuard = (data) => {
-        document.body.append("收到一个新舰长，触发事件BiLive_PlayWithMeJS.NewGuard，事件回调data内容如下<br/>");
-        document.body.append(JSON.stringify(data));
-        document.body.innerHTML += "<hr/>";
+        document.body.innerHTML += "<div>收到一个新舰长，触发事件BiLive_PlayWithMeJS.NewGuard，事件回调data内容如下<br/><pre>" + JSON.stringify(data, null, 4) + "</pre></div>";
     }
 
     // 绑定新SC事件
+    data数据样本 = {
+        "guard_level": 0,
+        "uid": 1270482,
+        "uname": "Sequbre",
+        "uface": "http://i0.hdslb.com/bfs/face/061e978938b8a60b4920fad15596657e77465170.jpg",
+        "message_id": 3992851,
+        "message": "进行一个鱼的摸",
+        "rmb": 30,
+        "timestamp": 1652413567,
+        "start_time": 1652413567,
+        "end_time": 1652413627,
+        "fans_medal_level": 0,
+        "fans_medal_name": "",
+        "fans_medal_wearing_status": false,
+        "msg_id": "968e07ea-49e6-478c-867e-b721ccbd0d62",
+        "room_id": 4639581,
+        "type": "SuperChat"
+    }
     BiLive_PlayWithMeJS.NewSC = (data) => {
-        document.body.append("收到一条SC，触发事件BiLive_PlayWithMeJS.NewSC，事件回调data内容如下<br/>");
-        document.body.append(JSON.stringify(data));
-        document.body.innerHTML += "<hr/>";
+        document.body.innerHTML += "<div>收到一条SC，触发事件BiLive_PlayWithMeJS.NewSC，事件回调data内容如下<br/><pre>" + JSON.stringify(data, null, 4) + "</pre></div>";
     }
 
     // 绑定SC撤回事件
     BiLive_PlayWithMeJS.DelSC = (data) => {
-        document.body.append("有一条SC被紧急撤回，触发事件BiLive_PlayWithMeJS.DelSC，事件回调data内容如下<br/>");
-        document.body.append(JSON.stringify(data));
-        document.body.innerHTML += "<hr/>";
+        document.body.innerHTML += "<div>有一条SC被紧急撤回，触发事件BiLive_PlayWithMeJS.DelSC，事件回调data内容如下<br/><pre>" + JSON.stringify(data, null, 4) + "</pre></div>";
     }
 
     // 初始化PlayWithMe.js的WEBSocket监听
