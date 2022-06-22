@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta http-equiv="content-language" content="zh-CN">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit">
+    <meta content="never" name="referrer">
+
+    <title>PlayWithMe.js B站开平长链开源H5客户端演示 - 雪狼七组/ProjectP3：BiLive</title>
+    <meta name="author" content="[XL7Z]Ms_KuroNeko">
+
+    <!-- https://github.com/h2non/jshashes -->
+    <script src="./../Lib/h2non/jshashes.min.js" type="text/javascript"></script>
+    <!-- https://github.com/LinusU/decode-utf8 -->
+    <script src="./../Lib/LinusU/decode-utf8.js" type="text/javascript"></script>
+
+    <script src="./../MyOpenLiveKey.js" type="text/javascript"></script>
+    <script src="./../Lib/PlayWithMe.js/BiLive_PlayWithMe.js" type="text/javascript"></script>
+
+
+
+</head>
+
+<body>
+
+
+
+</body>
+<script>
+    // 使用本地签名，自行提供开发者帐号
+    // 需要使用强制无CORS检查模式下的浏览器，否则申请访问B站API会被拦截，请用文件夹里的bat启动
+    // 为了防止直播写代码无意中泄露开发者秘钥，或者git无意中上传开发者密钥，将密钥写在了另一个文件里
+    BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey = MyOpenLiveKey.AccessKey;
+    BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey = MyOpenLiveKey.SecretKey;
+    // 使用第三方代签服务器，此项设定后上面的本地自签将会失效
+    BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer = "";
+
+    BiLive_PlayWithMeJS.NewDanmaku = (data) => {
+        document.body.append(JSON.stringify(data));
+        document.body.innerHTML += "<hr/>";
+    }
+
+    BiLive_PlayWithMeJS.Init();
+</script>
+
+</html>
