@@ -1,0 +1,1 @@
+start chrome --disable-web-security --user-data-dir=%cd%/ChromeDeveloperFile %cd%
