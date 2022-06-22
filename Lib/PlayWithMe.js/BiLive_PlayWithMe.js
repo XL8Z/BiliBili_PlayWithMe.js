@@ -660,15 +660,11 @@ class BiLive_PlayWithMeJS_UtilTools {
  */
 class BiLive_PlayWithMeJS_CombinedGifts {
 
-    /**
-     * 总连击礼物量
-     */
-    gift_num = 0;
 
     /**
      * 第一个事件的所有数据
      */
-    GftEvt = {};
+    Evt = {};
 
     /**
      * 最后一次累加到现在的秒数
@@ -677,22 +673,9 @@ class BiLive_PlayWithMeJS_CombinedGifts {
 
     constructor(Gft) {
         // 拷贝基础数据
-        this.GftEvt = Gft;
-        this.uid = Gft.uid;
-        this.uname = Gft.uname;
-        this.uface = Gft.uface;
-        this.gift_id = Gft.gift_id;
-        this.gift_name = Gft.gift_name;
-        this.price = Gft.price;
-        this.paid = Gft.paid;
-        this.fans_medal_level = Gft.fans_medal_level;
-        this.fans_medal_name = Gft.fans_medal_name;
-        this.guard_level = Gft.guard_level;
-        this.timestamp = Gft.timestamp;
-        this.time = Gft.time;
-        this.anchor_info = Gft.anchor_info;
+        this.Evt = Gft;
         // 移除了外层"cmd": "LIVE_OPEN_PLATFORM_SEND_GIFT"，补个类型以防万一
-        this.type = "Gifts";
+        this.Evt.type = "Gifts";
     }
 
     /**
@@ -702,7 +685,7 @@ class BiLive_PlayWithMeJS_CombinedGifts {
      */
     Add(Num) {
         // 累加计数
-        this.gift_num += Num;
+        this.Evt.gift_num += Num;
         // 重置计时器
         this.TimerCount = 0;
     }
@@ -732,9 +715,9 @@ class BiLive_PlayWithMeJS_CombinedGifts {
      */
     Execute() {
         // 触发事件
-        BiLive_PlayWithMeJS.NewGifts(this);
+        BiLive_PlayWithMeJS.NewGifts(this.Evt);
         // 移除Map注销自身
-        BiLive_PlayWithMeJS.GiftCombine_Map.delete(BiLive_PlayWithMeJS_CombinedGifts.MakeID(this));
+        BiLive_PlayWithMeJS.GiftCombine_Map.delete(BiLive_PlayWithMeJS_CombinedGifts.MakeID(this.Evt));
     }
 
 }
