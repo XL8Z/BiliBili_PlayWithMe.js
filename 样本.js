@@ -10,6 +10,7 @@
             "uid": 3102384,
             "uname": "猫裙少年泽远喵",
             "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+            "msg_id": "eb805544-0cf2-4688-bca1-88299e5344bf",
             "room_id": 4639581
         },
         "cmd": "LIVE_OPEN_PLATFORM_DM"
@@ -32,7 +33,9 @@
                 "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
                 "uid": 3102384,
                 "uname": "猫裙少年泽远喵"
-            }
+            },
+            "msg_id": "e0677be6-4d08-49bc-a722-17238b0f370b",
+            "room_id": 4639581
         },
         "cmd": "LIVE_OPEN_PLATFORM_SEND_GIFT"
     },
