@@ -308,7 +308,42 @@ class BiLive_PlayWithMeJS {
                         }
                     )
                 });
-        } 
+        } else {
+            let RequestBody = {
+                "app_id": BiLive_PlayWithMeJS.AppID,
+                "code": BiLive_PlayWithMeJS.AuthCode
+            };
+
+            let AppStartRequest = new Request(
+                "https://live-open.biliapi.com/v2/app/start", {
+                method: "POST",
+                headers: BiLive_PlayWithMeJS_Authorizer.LocalAuthorizer_GenerateAuthorizedHead(RequestBody),
+                body: JSON.stringify(RequestBody)
+            }
+            )
+            console.log("[BiLive_PlayWithMeJS]", "准备使用 APIv2 发起 AppStart 请求")
+            fetch(AppStartRequest).then(
+                res => {
+                    res.json().then(
+                        json => {
+                            BiLive_PlayWithMeJS.AppStartResponse = json;
+                            if (BiLive_PlayWithMeJS.AppStartResponse.code == 0) {
+                                console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON");
+                                console.debug(BiLive_PlayWithMeJS.AppStartResponse);
+                                BiLive_PlayWithMeJS.WSClient = new BiLive_PlayWithMeJS_WEBSocketClient();
+
+                                // 转存返回的主播数据到方便用的位置上
+                                BiLive_PlayWithMeJS.RoomID = json.data.anchor_info.room_id;
+                                BiLive_PlayWithMeJS.UID = json.data.anchor_info.uid;
+                                BiLive_PlayWithMeJS.Avator = json.data.anchor_info.uface;
+                                BiLive_PlayWithMeJS.NickName = json.data.anchor_info.uname;
+
+                            } else BiLive_PlayWithMeJS_UtilTools.AnalyzeErrCode(BiLive_PlayWithMeJS.AppStartResponse.code);
+                        }
+                    )
+                });
+        }
+
     }
 
     /**
@@ -590,6 +625,22 @@ class BiLive_PlayWithMeJS_Authorizer {
     static JSONPAuthorizerServer = "";
 
     /**
+     * 检查开发者密钥是否已配置
+     */
+    static Chk_DvlprKeys() {
+        let Rtn = true;
+        if (BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey == null || BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey == "" || typeof BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey == 'undefined') {
+            console.error("[BiLive_PlayWithMeJS] [开平签名器]", "未能检测到有效的AccessKey\n如果你打算进行离线测试与体验，请把自己的Key写入根目录下的 MyOpenLiveKey.js 内\n或设置 BiLive_PlayWithMeJS_Authorizer.AccessKey = \"你的开放平台开发者AccessKey\"");
+            Rtn = false;
+        }
+        if (BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey == null || BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey == "" || typeof BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey == 'undefined') {
+            console.error("[BiLive_PlayWithMeJS] [开平签名器]", "未能检测到有效的SecretKey\n如果你打算进行离线测试与体验，请把自己的Key写入根目录下的 MyOpenLiveKey.js 内\n或设置 BiLive_PlayWithMeJS_Authorizer.SecretKey = \"你的开放平台开发者SecretKey\"");
+            Rtn = false;
+        }
+        return Rtn;
+    }
+
+    /**
      * 检查饭贩参数
      */
     static Chk_FanFanParam() {
@@ -639,6 +690,54 @@ class BiLive_PlayWithMeJS_Authorizer {
         return true;
     }
 
+    static LocalAuthorizer_GenerateAuthorizedHead(RequestBody) {
+        let MD5 = new Hashes.MD5();
+        let HMAC_SHA256 = new Hashes.SHA256();
+        console.warn("[BiLive_PlayWithMeJS] 正在进行本地强制跨域请求，这种把开发者Key写入静态前端文件的方式极度危险，稍一不慎随时有可能导致你的开放平台开发者Key外泄！\n目前据说是可以通过寻求开放平台工作人员帮助的形式强制更换开发者Key，但具体操作流程非常麻烦，请千万小心不要把写入自己Key版本流出！");
+        BiLive_PlayWithMeJS_Authorizer.Chk_DvlprKeys()
+        console.debug("[BiLive_PlayWithMeJS] [开平签名器] [本地模式]", "待签名的POST请求，其Body内容为\n" + JSON.stringify(RequestBody));
+        let BodyMD5 = MD5.hex(JSON.stringify(RequestBody));
+        let RdmInt = parseInt(Math.random() * 10000000);
+        let Timestamp = Math.round(new Date() / 1000);
+        console.debug("[BiLive_PlayWithMeJS] [开平签名器] [本地模式]", "待签名的POST请求，其Body内容的MD5值为\n" + BodyMD5);
+        let xBiliHeaders = "x-bili-accesskeyid:" +
+            BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey +
+            "\nx-bili-content-md5:" + BodyMD5 +
+            "\nx-bili-signature-method:HMAC-SHA256" +
+            "\nx-bili-signature-nonce:" + RdmInt +
+            "\nx-bili-signature-version:1.0" +
+            "\nx-bili-timestamp:" + Timestamp;
+
+        console.debug("[BiLive_PlayWithMeJS] [开平签名器] [本地模式]", "待签名的POST请求，其需要HMAC签名的内容为\n" + xBiliHeaders);
+        let HMAC = HMAC_SHA256.hex_hmac(BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey, xBiliHeaders);
+        console.debug("[BiLive_PlayWithMeJS] [开平签名器] [本地模式]", "对上述内容使用你的开发者SecretKey进行HMAC-SHA256签名，得到的结果为\n" + HMAC);
+        return {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "x-bili-accesskeyid": BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey,
+            "x-bili-content-md5": BodyMD5,
+            "x-bili-signature-method": "HMAC-SHA256",
+            "x-bili-signature-nonce": RdmInt,
+            "x-bili-signature-version": "1.0",
+            "x-bili-timestamp": Timestamp,
+            "Authorization": HMAC
+        };
+    };
+
+    /**
+     * 本地检查Sign
+     * - 我知道没啥用，就是给你们看看流程
+     */
+    static LocalAuthorizer_SignCheck() {
+        let HMAC_SHA256 = new Hashes.SHA256();
+        let Str = "Caller:bilibili\nCode:" + BiLive_PlayWithMeJS.AuthCode + "\nMid:" + BiLive_PlayWithMeJS.MID + "\nTimestamp:" + BiLive_PlayWithMeJS.Timestamp;
+        console.debug("[BiLive_PlayWithMeJS] [开平签名器] [本地模式]", "待签名的贩贩请求字符串\n" + Str);
+        let HMAC = HMAC_SHA256.hex_hmac(BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey, Str);
+        console.debug("[BiLive_PlayWithMeJS] [开平签名器] [本地模式]", "对上述内容使用你的开发者SecretKey进行HMAC-SHA256签名，得到的结果为\n" + HMAC);
+        console.debug("[BiLive_PlayWithMeJS] [开平签名器] [本地模式]", "饭贩链接里提供的Sign参数为\n" + BiLive_PlayWithMeJS.CodeSign +
+            "\n比对结果为" + (HMAC == BiLive_PlayWithMeJS.CodeSign));
+        return (HMAC == BiLive_PlayWithMeJS.CodeSign);
+    }
 }
 
 class BiLive_PlayWithMeJS_UtilTools {
@@ -934,62 +1033,5 @@ class BiLive_PlayWithMeJS_AuthDialog {
         } else {
             console.error("[BiLive_PlayWithMeJS] [索码弹窗]", "无法读入身份码，可能已经错误的销毁了输入框与弹窗");
         }
-    }
-}
-
-
-/**
- * UTF-解码类
- * - 原名 decode-utf8
- * - 作者 LinusU
- * - https://github.com/LinusU/decode-utf8
- */
-class decode_utf8 {
-    static toUint8Array(input) {
-        if (input instanceof Uint8Array) return input
-        if (input instanceof ArrayBuffer) return new Uint8Array(input)
-
-        throw new TypeError('Expected "input" to be an ArrayBuffer or Uint8Array')
-    }
-
-    static decodeUtf8(input) {
-        const data = decode_utf8.toUint8Array(input)
-        const size = data.length
-
-        let result = ''
-
-        for (let index = 0; index < size; index++) {
-            let byte1 = data[index]
-
-            // US-ASCII
-            if (byte1 < 0x80) {
-                result += String.fromCodePoint(byte1)
-                continue
-            }
-
-            // 2-byte UTF-8
-            if ((byte1 & 0xE0) === 0xC0) {
-                let byte2 = (data[++index] & 0x3F)
-                result += String.fromCodePoint(((byte1 & 0x1F) << 6) | byte2)
-                continue
-            }
-
-            if ((byte1 & 0xF0) === 0xE0) {
-                let byte2 = (data[++index] & 0x3F)
-                let byte3 = (data[++index] & 0x3F)
-                result += String.fromCodePoint(((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3)
-                continue
-            }
-
-            if ((byte1 & 0xF8) === 0xF0) {
-                let byte2 = (data[++index] & 0x3F)
-                let byte3 = (data[++index] & 0x3F)
-                let byte4 = (data[++index] & 0x3F)
-                result += String.fromCodePoint(((byte1 & 0x07) << 0x12) | (byte2 << 0x0C) | (byte3 << 0x06) | byte4)
-                continue
-            }
-        }
-
-        return result
     }
 }
