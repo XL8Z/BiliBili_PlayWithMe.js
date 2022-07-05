@@ -331,25 +331,21 @@ class BiLive_PlayWithMeJS {
     }
 }
 
-// https://open-live.bilibili.com/document/doc&tool/api/websocket.html
+
+/**
+ * 开平长链定制版WEBSocket客户端
+ * - 长链数据结构和包定义见 https://open-live.bilibili.com/document/doc&tool/api/websocket.html
+ */
 class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
     constructor() {
         super("wss://broadcastlv.chat.bilibili.com:443/sub")
 
         // 长链启动后进行初始化
         this.onopen = (evt) => {
+            // 发送内含Auth字符串的握手包
             this.Login();
-            // 握手完毕后，先丢一个心跳包过去探路，原理跟踹猫一脚看看猫叫不叫差不多
-            // 【你懂什么，这也是握手的一部分.gif】
-            this.HeartBeat();
-            // 设置循环发送，告诉服务器自己还活着，不然抠逼服务器会把长链接掐了
-            //【还没死hao透.gif】
-            setInterval(() => {
-                this.HeartBeat();
-                // 定时发送循环延迟，单位毫秒【20000=20秒】
-                // B站说30，我就20，这叫保守，懂么？【什么层层加码】
-            }, 20000);
         }
+
 
         // 长链接收到数据后进行处理
         this.onmessage = (msg) => {
@@ -363,7 +359,8 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
     Login() {
         // 把之前 AppStart 拿到的带授权码的 JSON，以 UTF-8 编码转换为 ByteArray
         // 【里面是之前AppStart拿到的带密钥的JSON，证明本次开平长链请求得到授权】
-        let Body = BiLive_PlayWithMeJS_UtilTools.Str2Uint8Array(BiLive_PlayWithMeJS.AppStartResponse.data.websocket_info.auth_body);
+        let Body = BiLive_PlayWithMeJS_UtilTools.Str2Uint8Array(
+            BiLive_PlayWithMeJS.AppStartResponse.data.websocket_info.auth_body);
         // 编码后的内容长度加上固定16的包头，推算出数据包总长度
         let PkgLength = 16 + Body.length;
         // 包头部分
@@ -396,6 +393,25 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
         this.send(PkgData);
     }
 
+    /**
+     * 收到B站WEBSocket服务器回复登陆成功的包之后进行的后续处理
+     */
+    LoginAuthorized() {
+        // 握手完毕后，先丢一个心跳包过去探路，原理跟踹猫一脚看看猫叫不叫差不多
+        // 【你懂什么，这也是握手的一部分.gif】
+        this.HeartBeat();
+        // 设置循环发送，告诉服务器自己还活着，不然抠逼服务器会把长链接掐了
+        //【还没死hao透.gif】
+        setInterval(() => {
+            this.HeartBeat();
+            // 定时发送循环延迟，单位毫秒【20000=20秒】
+            // B站说30，我就20，这叫保守，懂么？【什么层层加码】
+        }, 20000);
+    }
+
+    /**
+     * 发送一个心跳包
+     */
     HeartBeat() {
         let PkgData = new Uint8Array([
             // 【Packet Length】包长16字节(Byte)【16个8位(Bit)】
@@ -416,10 +432,13 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
         this.send(PkgData);
     }
 
-
+    /**
+     * 拿到数据包之后的处理
+     * - 包类型参考 https://open-live.bilibili.com/document/doc&tool/api/websocket.html
+     */
     NewPkg(Pkg) {
         // 判断协议版本，这里把1包括进来，因为野生WS客户端经常接受到协议1的无压缩内容
-        // 协议版本为2的是zlib压缩过的包，暂时不处理，直接报错
+        // 协议版本为2的是zlib压缩过的包，暂时不处理，直接报错，因为据说开放平台根本没有压缩过的包
         console.debug("[BiLive_PlayWithMeJS] [开平长链]", "收到服务器的数据包\n" + BiLive_PlayWithMeJS_UtilTools.Uint8Array2HexStr(Pkg));
         if (Pkg[7] < 2) {
             switch (Pkg[11]) {
@@ -437,6 +456,8 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
                 case 8:
                     console.log("[BiLive_PlayWithMeJS] [开平长链]", "服务器收到登录包并确认你是正经开发者，终于打算理你了");
                     console.log("[BiLive_PlayWithMeJS] [开平长链]", "开平长链建立成功，开始监听 " + BiLive_PlayWithMeJS.NickName + " 的直播间，房间号 " + BiLive_PlayWithMeJS.RoomID);
+                    this.LoginAuthorized();
+                    BiLive_PlayWithMeJS.AppStarted(BiLive_PlayWithMeJS.AppStartResponse);
                     BiLive_PlayWithMeJS.Test({
                         "data": {
                             "fans_medal_level": 21,
@@ -452,7 +473,6 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
                         },
                         "cmd": "LIVE_OPEN_PLATFORM_DM"
                     });
-                    BiLive_PlayWithMeJS.AppStarted(BiLive_PlayWithMeJS.AppStartResponse);
                     break;
             }
         }
@@ -485,11 +505,12 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
                     let ID = BiLive_PlayWithMeJS_CombinedGifts.MakeID(Msg.data);
                     // 根据合并参照ID查询正在进行的礼物合并项
                     if (!(BiLive_PlayWithMeJS.GiftCombine_Map.has(ID))) {
+                        // 获取新的或者旧的礼物合并项并让其加入新的数量
+                        BiLive_PlayWithMeJS.GiftCombine_Map.get(ID).Add(Msg.data.gift_num);
+                    } else {
                         // 如果没有，创建一个新的礼物合并项
                         BiLive_PlayWithMeJS.GiftCombine_Map.set(ID, new BiLive_PlayWithMeJS_CombinedGifts(Msg.data));
                     }
-                    // 获取新的或者旧的礼物合并项并让其加入新的数量
-                    BiLive_PlayWithMeJS.GiftCombine_Map.get(ID).Add(Msg.data.gift_num);
                 }
                 // 如果不使用礼物合并则直接输出
                 else {

@@ -116,6 +116,7 @@ v2接口请求AppStart = {
 }
 
 v1API = {
+    请求应用启动: { "code": 0, "message": "0", "request_id": "1541720746409832448", "data": {} },
     请求开平长链: {
         "code": 0,
         "message": "0",

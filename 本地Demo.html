@@ -44,15 +44,27 @@
 
 <body>
 
-
+    <div>
+        请熟练使用谷歌浏览器的开发者工具【[F12]呼出】来观察本Demo<br/> 注：通讯部分控制台默认不输出，请把控制台等级从默认调到DeBug
+    </div>
 
 </body>
 <script>
+    // 开放平台应用ID，见应用详情页面 https://open-live.bilibili.com/open-manage
+    // 注意AppID绑定对应开发者帐号配套的AccessKey和SecretKey，使用自己的AppID一定要配自己的Key
+    BiLive_PlayWithMeJS.AppID = 1653902473586;
+
+    // 主播开放平台身份码，见开播页面 https://link.bilibili.com/p/center/index#/my-room/start-live
+    // 为空自动弹出弹窗索要身份码，可以手动输入
+    // 也可以预先通过网页GET参数给入，比如 Demo.html?Code=BNB1RBFZQ96O4
+    // 当然也可以写死在JS代码里，如 BiLive_PlayWithMeJS.AuthCode="BNB1RBFZQ96O4";
+
     // 使用本地签名，自行提供开发者帐号
     // 需要使用强制无CORS检查模式下的浏览器，否则申请访问B站API会被拦截，请用文件夹里的bat启动
     // 为了防止直播写代码无意中泄露开发者秘钥，或者git无意中上传开发者密钥，将密钥写在了另一个文件里
     BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey = MyOpenLiveKey.AccessKey;
     BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey = MyOpenLiveKey.SecretKey;
+
     // 使用第三方代签服务器，此项设定后上面的本地自签将会失效
     BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer = "";
 
