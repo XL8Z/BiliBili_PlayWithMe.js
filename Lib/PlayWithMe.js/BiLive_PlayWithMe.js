@@ -53,13 +53,6 @@ class BiLive_PlayWithMeJS {
     static NickName = "必须先执行AppStart，服务器才会解密身份码返回主播的真实数据";
 
     /**
-     * 代签项目ID
-     * - 不使第三方批量代签可以不用
-     * - 个人自签时可以写死
-     */
-    static PWMID = ""
-
-    /**
      * 饭贩插件v2接口签名 
      */
     static CodeSign = ""
@@ -197,9 +190,9 @@ class BiLive_PlayWithMeJS {
         if (BiLive_PlayWithMeJS.Paramaters.has("CODESIGN"))
             BiLive_PlayWithMeJS.CodeSign = BiLive_PlayWithMeJS.Paramaters.get("CODESIGN");
         if (BiLive_PlayWithMeJS.Paramaters.has("TIMESTAMP"))
-            BiLive_PlayWithMeJS.Timestamp = BiLive_PlayWithMeJS.Paramaters.get("TIMESTAMP");
+            BiLive_PlayWithMeJS.Timestamp = parseInt(BiLive_PlayWithMeJS.Paramaters.get("TIMESTAMP"));
         if (BiLive_PlayWithMeJS.Paramaters.has("MID"))
-            BiLive_PlayWithMeJS.MID = BiLive_PlayWithMeJS.Paramaters.get("MID");
+            BiLive_PlayWithMeJS.MID = parseInt(BiLive_PlayWithMeJS.Paramaters.get("MID"));
 
         if (BiLive_PlayWithMeJS.AuthCode.length > 0) {
             console.log("检测到主播授权的身份码，自动启动");
@@ -220,41 +213,14 @@ class BiLive_PlayWithMeJS {
         if (BiLive_PlayWithMeJS_Authorizer.Chk_JSONPAuthorizerServer()) {
             // 使用JSONP方式获取签名授权进行连接
             let Elmts = document.createElement('script');
-            Elmts.src = BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer + "?AuthCode=" + BiLive_PlayWithMeJS.AuthCode;
+            Elmts.src = BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer + window.location.search + "&AppID=" + BiLive_PlayWithMeJS.AppID+ "&PWMID=" + BiLive_PlayWithMeJS_Authorizer.PWMID;
             document.body.appendChild(Elmts);
-
+            console.log("[BiLive_PlayWithMeJS]", "尝试 第三方JSONP代签 请求 AppStart");
             Elmts.onload = (evt) => {
-                BiLive_PlayWithMeJS.AppStartResponse = BiLiveChat_RemoteAuthorizerResponse;
-
-                if (BiLive_PlayWithMeJS.AppStartResponse.code == 0) {
-                    console.log("[BiLive_PlayWithMeJS]", "JSONP代签请求 AppStart 成功，下发房间数据与开平长链登录JSON");
-                    console.debug(BiLive_PlayWithMeJS.AppStartResponse);
-                    BiLive_PlayWithMeJS.WSClient = new BiLive_PlayWithMeJS_WEBSocketClient();
-
-                    // 转存返回的主播数据到方便用的位置上
-                    BiLive_PlayWithMeJS.RoomID = BiLiveChat_RemoteAuthorizerResponse.data.anchor_info.room_id;
-                    BiLive_PlayWithMeJS.UID = BiLiveChat_RemoteAuthorizerResponse.data.anchor_info.uid;
-                    BiLive_PlayWithMeJS.Avator = BiLiveChat_RemoteAuthorizerResponse.data.anchor_info.uface;
-                    BiLive_PlayWithMeJS.NickName = BiLiveChat_RemoteAuthorizerResponse.data.anchor_info.uname;
-
-                } else BiLive_PlayWithMeJS.Test({
-                    "data": {
-                        "fans_medal_level": 21,
-                        "fans_medal_name": "官方",
-                        "fans_medal_wearing_status": false,
-                        "guard_level": 0,
-                        "msg": "PlayWithMe：JSONP代签失败，" + BiLiveChat_RemoteAuthorizerResponse.msg,
-                        "timestamp": 1655354216,
-                        "uid": 3102384,
-                        "uname": "猫裙少年泽远喵",
-                        "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
-                        "room_id": 4639581
-                    },
-                    "cmd": "LIVE_OPEN_PLATFORM_DM"
-                });;
+                BiLive_PlayWithMeJS.AppStartResponse = PlayWithMe_AuthorizerProxyResponse;
+                BiLive_PlayWithMeJS.AfterAppStart();
                 evt.currentTarget.remove();
             }
-
             Elmts.onerror = (evt) => {
                 BiLive_PlayWithMeJS.Test({
                     "data": {
@@ -275,40 +241,66 @@ class BiLive_PlayWithMeJS {
             }
         } else if (BiLive_PlayWithMeJS_Authorizer.Chk_SameOriginAuthorizerServer()) {
             let AppStartRequest = new Request(
-                SameOriginAuthorizerServer, {
+                BiLive_PlayWithMeJS_Authorizer.SameOriginAuthorizerServer, {
                 method: "POST",
-                body: {
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Csrf-Token": "Tamamo254"
+                },
+                body: JSON.stringify({
                     AppID: BiLive_PlayWithMeJS.AppID,
-                    PWMID: BiLive_PlayWithMeJS.PWMID,
-                    AuthCode: BiLive_PlayWithMeJS.AuthCode,
+                    PWMID: BiLive_PlayWithMeJS_Authorizer.PWMID,
+                    Code: BiLive_PlayWithMeJS.AuthCode,
                     CodeSign: BiLive_PlayWithMeJS.CodeSign,
-                    Mid: Int,
-                    Timestamp: Int
-                }
+                    Mid: BiLive_PlayWithMeJS.MID,
+                    Timestamp: BiLive_PlayWithMeJS.Timestamp
+                })
             }
             )
-            console.log("[BiLive_PlayWithMeJS]", "准备使用 APIv2 发起 AppStart 请求")
+            console.log("[BiLive_PlayWithMeJS]", "尝试 第三方普通代签 请求 AppStart");
             fetch(AppStartRequest).then(
                 res => {
                     res.json().then(
                         json => {
                             BiLive_PlayWithMeJS.AppStartResponse = json;
-                            if (BiLive_PlayWithMeJS.AppStartResponse.code == 0) {
-                                console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON");
-                                console.debug(BiLive_PlayWithMeJS.AppStartResponse);
-                                BiLive_PlayWithMeJS.WSClient = new BiLive_PlayWithMeJS_WEBSocketClient();
-
-                                // 转存返回的主播数据到方便用的位置上
-                                BiLive_PlayWithMeJS.RoomID = json.data.anchor_info.room_id;
-                                BiLive_PlayWithMeJS.UID = json.data.anchor_info.uid;
-                                BiLive_PlayWithMeJS.Avator = json.data.anchor_info.uface;
-                                BiLive_PlayWithMeJS.NickName = json.data.anchor_info.uname;
-
-                            } else BiLive_PlayWithMeJS_UtilTools.AnalyzeErrCode(BiLive_PlayWithMeJS.AppStartResponse.code);
+                            BiLive_PlayWithMeJS.AfterAppStart();
                         }
                     )
                 });
         } 
+    }
+
+    static AfterAppStart(Mode) {
+        if (BiLive_PlayWithMeJS.AppStartResponse.code == 0) {
+            console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON");
+            console.debug(BiLive_PlayWithMeJS.AppStartResponse);
+
+            // 转存返回的主播数据到方便用的位置上
+            BiLive_PlayWithMeJS.RoomID = BiLive_PlayWithMeJS.AppStartResponse.data.anchor_info.room_id;
+            BiLive_PlayWithMeJS.UID = BiLive_PlayWithMeJS.AppStartResponse.data.anchor_info.uid;
+            BiLive_PlayWithMeJS.Avator = BiLive_PlayWithMeJS.AppStartResponse.data.anchor_info.uface;
+            BiLive_PlayWithMeJS.NickName = BiLive_PlayWithMeJS.AppStartResponse.data.anchor_info.uname;
+
+            BiLive_PlayWithMeJS.WSClient = new BiLive_PlayWithMeJS_WEBSocketClient();
+        } else {
+            BiLive_PlayWithMeJS_UtilTools.AnalyzeErrCode(BiLive_PlayWithMeJS.AppStartResponse.code);
+            BiLive_PlayWithMeJS.Test({
+                "data": {
+                    "fans_medal_level": 21,
+                    "fans_medal_name": "官方",
+                    "fans_medal_wearing_status": false,
+                    "guard_level": 0,
+                    "msg": "PlayWithMe：代签失败，" + BiLiveChat_RemoteAuthorizerResponse.msg,
+                    "timestamp": 1655354216,
+                    "uid": 3102384,
+                    "uname": "猫裙少年泽远喵",
+                    "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+                    "room_id": 4639581
+                },
+                "cmd": "LIVE_OPEN_PLATFORM_DM"
+            });;
+        }
     }
 
     /**
@@ -590,6 +582,13 @@ class BiLive_PlayWithMeJS_Authorizer {
     static JSONPAuthorizerServer = "";
 
     /**
+     * 代签项目ID
+     * - 不使第三方批量代签可以不用
+     * - 个人自签时可以写死
+     */
+    static PWMID = ""
+
+    /**
      * 检查饭贩参数
      */
     static Chk_FanFanParam() {
@@ -610,7 +609,7 @@ class BiLive_PlayWithMeJS_Authorizer {
      * 检查代签参数
      */
     static Chk_PWMID() {
-        if (BiLive_PlayWithMeJS.PWMID.length <= 0) {
+        if (BiLive_PlayWithMeJS_Authorizer.PWMID.length <= 0) {
             console.error("[BiLive_PlayWithMeJS] [开平签名器]", "未能检测到有效的代签服务ID");
             return false;
         }
@@ -638,7 +637,6 @@ class BiLive_PlayWithMeJS_Authorizer {
         }
         return true;
     }
-
 }
 
 class BiLive_PlayWithMeJS_UtilTools {
@@ -937,12 +935,11 @@ class BiLive_PlayWithMeJS_AuthDialog {
     }
 }
 
-
 /**
- * UTF-解码类
- * - 原名 decode-utf8
- * - 作者 LinusU
- * - https://github.com/LinusU/decode-utf8
+ * UTF-8解码类
+ * - decode-utf8
+ * - By LinusU
+ * - GitHub：https://github.com/LinusU/decode-utf8
  */
 class decode_utf8 {
     static toUint8Array(input) {
