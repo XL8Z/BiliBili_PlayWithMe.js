@@ -228,7 +228,7 @@ class BiLive_PlayWithMeJS {
                         "fans_medal_name": "官方",
                         "fans_medal_wearing_status": false,
                         "guard_level": 0,
-                        "msg": "PlayWithMe：JSONP代签失败，" + BiLiveChat_RemoteAuthorizerResponse.msg,
+                        "msg": "PlayWithMe：JSONP代签失败，" + BiLive_PlayWithMeJS.AppStartResponse.msg,
                         "timestamp": 1655354216,
                         "uid": 3102384,
                         "uname": "猫裙少年泽远喵",
@@ -313,7 +313,7 @@ class BiLive_PlayWithMeJS {
                     "fans_medal_name": "官方",
                     "fans_medal_wearing_status": false,
                     "guard_level": 0,
-                    "msg": "PlayWithMe：代签失败，" + BiLiveChat_RemoteAuthorizerResponse.msg,
+                    "msg": "PlayWithMe：代签失败，" + BiLive_PlayWithMeJS.AppStartResponse.msg,
                     "timestamp": 1655354216,
                     "uid": 3102384,
                     "uname": "猫裙少年泽远喵",
@@ -545,7 +545,7 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
                     // 制作“UID-礼物ID”格式的合并参照ID
                     let ID = BiLive_PlayWithMeJS_CombinedGifts.MakeID(Msg.data);
                     // 根据合并参照ID查询正在进行的礼物合并项
-                    if (!(BiLive_PlayWithMeJS.GiftCombine_Map.has(ID))) {
+                    if (BiLive_PlayWithMeJS.GiftCombine_Map.has(ID)) {
                         // 获取新的或者旧的礼物合并项并让其加入新的数量
                         BiLive_PlayWithMeJS.GiftCombine_Map.get(ID).Add(Msg.data.gift_num);
                     } else {

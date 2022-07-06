@@ -228,7 +228,7 @@ class BiLive_PlayWithMeJS {
                         "fans_medal_name": "官方",
                         "fans_medal_wearing_status": false,
                         "guard_level": 0,
-                        "msg": "PlayWithMe：JSONP代签失败，" + BiLiveChat_RemoteAuthorizerResponse.msg,
+                        "msg": "PlayWithMe：JSONP代签失败，" + BiLive_PlayWithMeJS.AppStartResponse.msg,
                         "timestamp": 1655354216,
                         "uid": 3102384,
                         "uname": "猫裙少年泽远喵",
@@ -291,7 +291,7 @@ class BiLive_PlayWithMeJS {
                     "fans_medal_name": "官方",
                     "fans_medal_wearing_status": false,
                     "guard_level": 0,
-                    "msg": "PlayWithMe：代签失败，" + BiLiveChat_RemoteAuthorizerResponse.msg,
+                    "msg": "PlayWithMe：代签失败，" + BiLive_PlayWithMeJS.AppStartResponse.msg,
                     "timestamp": 1655354216,
                     "uid": 3102384,
                     "uname": "猫裙少年泽远喵",
@@ -523,7 +523,7 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
                     // 制作“UID-礼物ID”格式的合并参照ID
                     let ID = BiLive_PlayWithMeJS_CombinedGifts.MakeID(Msg.data);
                     // 根据合并参照ID查询正在进行的礼物合并项
-                    if (!(BiLive_PlayWithMeJS.GiftCombine_Map.has(ID))) {
+                    if (BiLive_PlayWithMeJS.GiftCombine_Map.has(ID)) {
                         // 获取新的或者旧的礼物合并项并让其加入新的数量
                         BiLive_PlayWithMeJS.GiftCombine_Map.get(ID).Add(Msg.data.gift_num);
                     } else {
@@ -587,6 +587,22 @@ class BiLive_PlayWithMeJS_Authorizer {
      * - 个人自签时可以写死
      */
     static PWMID = ""
+
+    /**
+     * 检查开发者密钥是否已配置
+     */
+    static Chk_DvlprKeys() {
+        let Rtn = true;
+        if (BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey == null || BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey == "" || typeof BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveAccessKey == 'undefined') {
+            console.error("[BiLive_PlayWithMeJS] [开平签名器]", "未能检测到有效的AccessKey\n如果你打算进行离线测试与体验，请把自己的Key写入根目录下的 MyOpenLiveKey.js 内\n或设置 BiLive_PlayWithMeJS_Authorizer.AccessKey = \"你的开放平台开发者AccessKey\"");
+            Rtn = false;
+        }
+        if (BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey == null || BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey == "" || typeof BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey == 'undefined') {
+            console.error("[BiLive_PlayWithMeJS] [开平签名器]", "未能检测到有效的SecretKey\n如果你打算进行离线测试与体验，请把自己的Key写入根目录下的 MyOpenLiveKey.js 内\n或设置 BiLive_PlayWithMeJS_Authorizer.SecretKey = \"你的开放平台开发者SecretKey\"");
+            Rtn = false;
+        }
+        return Rtn;
+    }
 
     /**
      * 检查饭贩参数
