@@ -273,8 +273,7 @@ class BiLive_PlayWithMeJS {
 
     static AfterAppStart(Mode) {
         if (BiLive_PlayWithMeJS.AppStartResponse.code == 0) {
-            console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON");
-            console.debug(BiLive_PlayWithMeJS.AppStartResponse);
+            console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON",BiLive_PlayWithMeJS.AppStartResponse);
 
             // 转存返回的主播数据到方便用的位置上
             BiLive_PlayWithMeJS.RoomID = BiLive_PlayWithMeJS.AppStartResponse.data.anchor_info.room_id;
@@ -468,7 +467,7 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
                 case 5:
                     // 服务器通知你有新事件发生，此包夹带事件JSON
                     let Jsn = JSON.parse(decode_utf8.decodeUtf8(Pkg.slice(16)));
-                    console.debug("[BiLive_PlayWithMeJS] [开平长链]", "收到新直播间事件，解码后内容为\n" + Jsn);
+                    console.log("[BiLive_PlayWithMeJS] [开平长链]", "收到新直播间事件，解码后内容为\n", Jsn);
                     // 进行事件处理
                     BiLive_PlayWithMeJS_WEBSocketClient.NewJSONMsg(Jsn);
                     break;
