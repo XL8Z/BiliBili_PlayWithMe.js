@@ -244,8 +244,7 @@ class BiLive_PlayWithMeJS {
                 method: "POST",
                 headers: {
                     "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Csrf-Token": "Tamamo254"
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     AppID: BiLive_PlayWithMeJS.AppID,
@@ -264,9 +263,24 @@ class BiLive_PlayWithMeJS {
                         json => {
                             BiLive_PlayWithMeJS.AppStartResponse = json;
                             BiLive_PlayWithMeJS.AfterAppStart();
-                        }
-                    )
-                });
+                        })
+                }).then(
+                    BiLive_PlayWithMeJS.Test({
+                        "data": {
+                            "fans_medal_level": 21,
+                            "fans_medal_name": "官方",
+                            "fans_medal_wearing_status": false,
+                            "guard_level": 0,
+                            "msg": "PlayWithMe：签名失败，接口不可用",
+                            "timestamp": 1655354216,
+                            "uid": 3102384,
+                            "uname": "猫裙少年泽远喵",
+                            "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+                            "room_id": 4639581
+                        },
+                        "cmd": "LIVE_OPEN_PLATFORM_DM"
+                    })
+                );
         } else {
             let RequestBody = {
                 "app_id": BiLive_PlayWithMeJS.AppID,
@@ -285,16 +299,16 @@ class BiLive_PlayWithMeJS {
                     res.json().then(
                         json => {
                             BiLive_PlayWithMeJS.AppStartResponse = json;
+                            BiLive_PlayWithMeJS.AfterAppStart();
                         }
                     )
                 });
         }
-
     }
 
-    static AfterAppStart(Mode) {
+    static AfterAppStart() {
         if (BiLive_PlayWithMeJS.AppStartResponse.code == 0) {
-            console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON",BiLive_PlayWithMeJS.AppStartResponse);
+            console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON", BiLive_PlayWithMeJS.AppStartResponse);
 
             // 转存返回的主播数据到方便用的位置上
             BiLive_PlayWithMeJS.RoomID = BiLive_PlayWithMeJS.AppStartResponse.data.anchor_info.room_id;
@@ -311,7 +325,7 @@ class BiLive_PlayWithMeJS {
                     "fans_medal_name": "官方",
                     "fans_medal_wearing_status": false,
                     "guard_level": 0,
-                    "msg": "PlayWithMe：代签失败，" + BiLive_PlayWithMeJS.AppStartResponse.msg,
+                    "msg": "PlayWithMe：签名失败，" + BiLive_PlayWithMeJS.AppStartResponse.message,
                     "timestamp": 1655354216,
                     "uid": 3102384,
                     "uname": "猫裙少年泽远喵",

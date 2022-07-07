@@ -209,11 +209,10 @@ class BiLive_PlayWithMeJS {
      * - 如果说配置Key和代签就是瞄准，那这个方法就是开炮
      */
     static AppStart() {
-
         if (BiLive_PlayWithMeJS_Authorizer.Chk_JSONPAuthorizerServer()) {
             // 使用JSONP方式获取签名授权进行连接
             let Elmts = document.createElement('script');
-            Elmts.src = BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer + window.location.search + "&AppID=" + BiLive_PlayWithMeJS.AppID+ "&PWMID=" + BiLive_PlayWithMeJS_Authorizer.PWMID;
+            Elmts.src = BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer + window.location.search + "&AppID=" + BiLive_PlayWithMeJS.AppID + "&PWMID=" + BiLive_PlayWithMeJS_Authorizer.PWMID;
             document.body.appendChild(Elmts);
             console.log("[BiLive_PlayWithMeJS]", "尝试 第三方JSONP代签 请求 AppStart");
             Elmts.onload = (evt) => {
@@ -267,13 +266,29 @@ class BiLive_PlayWithMeJS {
                             BiLive_PlayWithMeJS.AfterAppStart();
                         }
                     )
-                });
-        } 
+                }).then(
+                    BiLive_PlayWithMeJS.Test({
+                        "data": {
+                            "fans_medal_level": 21,
+                            "fans_medal_name": "官方",
+                            "fans_medal_wearing_status": false,
+                            "guard_level": 0,
+                            "msg": "PlayWithMe：签名失败，接口不可用",
+                            "timestamp": 1655354216,
+                            "uid": 3102384,
+                            "uname": "猫裙少年泽远喵",
+                            "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+                            "room_id": 4639581
+                        },
+                        "cmd": "LIVE_OPEN_PLATFORM_DM"
+                    })
+                );;
+        }
     }
 
-    static AfterAppStart(Mode) {
+    static AfterAppStart() {
         if (BiLive_PlayWithMeJS.AppStartResponse.code == 0) {
-            console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON",BiLive_PlayWithMeJS.AppStartResponse);
+            console.log("[BiLive_PlayWithMeJS]", "AppStart 请求成功，下发房间数据与开平长链登录JSON", BiLive_PlayWithMeJS.AppStartResponse);
 
             // 转存返回的主播数据到方便用的位置上
             BiLive_PlayWithMeJS.RoomID = BiLive_PlayWithMeJS.AppStartResponse.data.anchor_info.room_id;
@@ -290,7 +305,7 @@ class BiLive_PlayWithMeJS {
                     "fans_medal_name": "官方",
                     "fans_medal_wearing_status": false,
                     "guard_level": 0,
-                    "msg": "PlayWithMe：代签失败，" + BiLive_PlayWithMeJS.AppStartResponse.msg,
+                    "msg": "PlayWithMe：签名失败，" + BiLive_PlayWithMeJS.AppStartResponse.message,
                     "timestamp": 1655354216,
                     "uid": 3102384,
                     "uname": "猫裙少年泽远喵",

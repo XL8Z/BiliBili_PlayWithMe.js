@@ -15,10 +15,9 @@
 
     <!-- https://github.com/h2non/jshashes -->
     <script src="./Lib/h2non/jshashes.min.js" type="text/javascript"></script>
-    <!-- https://github.com/LinusU/decode-utf8 -->
-    <script src="./Lib/LinusU/decode-utf8.js" type="text/javascript"></script>
+
     <!-- https://github.com/XL7Z/BiliBili_PlayWithMe.js -->
-    <script src="./Lib/PlayWithMe.js/BiLive_PlayWithMe.js" type="text/javascript"></script>
+    <script src="./Lib/PlayWithMe.js/BiLive_PlayWithMe.Full.js" type="text/javascript"></script>
 
     <script src="./MyOpenLiveKey.js" type="text/javascript"></script>
 
@@ -30,11 +29,11 @@
             padding: 1rem 0;
             width: -webkit-fill-available;
         }
-        
+
         body>div:last-child {
             border-bottom: none;
         }
-        
+
         pre {
             word-break: break-all;
             white-space: pre-wrap;
@@ -45,14 +44,14 @@
 <body>
 
     <div>
-        请熟练使用谷歌浏览器的开发者工具【[F12]呼出】来观察本Demo<br/> 注：通讯部分控制台默认不输出，请把控制台等级从默认调到DeBug
+        请熟练使用谷歌浏览器的开发者工具【[F12]呼出】来观察本Demo<br /> 注：通讯部分控制台默认不输出，请把控制台等级从默认调到DeBug
     </div>
 
 </body>
 <script>
     // 开放平台应用ID，见应用详情页面 https://open-live.bilibili.com/open-manage
     // 注意AppID绑定对应开发者帐号配套的AccessKey和SecretKey，使用自己的AppID一定要配自己的Key
-    BiLive_PlayWithMeJS.AppID = 1653902473586;
+    BiLive_PlayWithMeJS.AppID = 1659745254527;
 
     // 主播开放平台身份码，见开播页面 https://link.bilibili.com/p/center/index#/my-room/start-live
     // 为空自动弹出弹窗索要身份码，可以手动输入
@@ -66,6 +65,7 @@
     BiLive_PlayWithMeJS_Authorizer.BiliOpenLiveSecretKey = MyOpenLiveKey.SecretKey;
 
     // 使用第三方代签服务器，此项设定后上面的本地自签将会失效
+    BiLive_PlayWithMeJS_Authorizer.SameOriginAuthorizerServer = "";
     BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer = "";
 
     //绑定申请启动成功事件
