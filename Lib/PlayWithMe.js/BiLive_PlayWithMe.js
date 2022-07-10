@@ -800,6 +800,7 @@ class BiLive_PlayWithMeJS_AuthDialog {
         Style.id = "css_PlayWithMeJS_AuthDialog";
         Style.innerHTML =
             "#div_PlayWithMeJS_AuthDialog {\
+            z-index:9999;\
             position: fixed;\
             width: 100vw;\
             width: -webkit-fill-available;\
