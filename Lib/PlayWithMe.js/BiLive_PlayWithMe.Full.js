@@ -209,101 +209,9 @@ class BiLive_PlayWithMeJS {
      * - 如果说配置Key和代签就是瞄准，那这个方法就是开炮
      */
     static AppStart() {
-        if (BiLive_PlayWithMeJS_Authorizer.Chk_JSONPAuthorizerServer()) {
-            // 使用JSONP方式获取签名授权进行连接
-            let Elmts = document.createElement('script');
-            Elmts.src = BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer + window.location.search + "&AppID=" + BiLive_PlayWithMeJS.AppID + "&PWMID=" + BiLive_PlayWithMeJS_Authorizer.PWMID;
-            document.body.appendChild(Elmts);
-            console.log("[BiLive_PlayWithMeJS]", "尝试 第三方JSONP代签 请求 AppStart");
-            Elmts.onload = (evt) => {
-                BiLive_PlayWithMeJS.AppStartResponse = PlayWithMe_AuthorizerProxyResponse;
-                BiLive_PlayWithMeJS.AfterAppStart();
-                evt.currentTarget.remove();
-            }
-            Elmts.onerror = (evt) => {
-                BiLive_PlayWithMeJS.Test({
-                    "data": {
-                        "fans_medal_level": 21,
-                        "fans_medal_name": "官方",
-                        "fans_medal_wearing_status": false,
-                        "guard_level": 0,
-                        "msg": "PlayWithMe：JSONP代签失败，" + BiLive_PlayWithMeJS.AppStartResponse.msg,
-                        "timestamp": 1655354216,
-                        "uid": 3102384,
-                        "uname": "猫裙少年泽远喵",
-                        "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
-                        "room_id": 4639581
-                    },
-                    "cmd": "LIVE_OPEN_PLATFORM_DM"
-                });
-                evt.currentTarget.remove();
-            }
-        } else if (BiLive_PlayWithMeJS_Authorizer.Chk_SameOriginAuthorizerServer()) {
-            let AppStartRequest = new Request(
-                BiLive_PlayWithMeJS_Authorizer.SameOriginAuthorizerServer, {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    AppID: BiLive_PlayWithMeJS.AppID,
-                    PWMID: BiLive_PlayWithMeJS_Authorizer.PWMID,
-                    Code: BiLive_PlayWithMeJS.AuthCode,
-                    CodeSign: BiLive_PlayWithMeJS.CodeSign,
-                    Mid: BiLive_PlayWithMeJS.MID,
-                    Timestamp: BiLive_PlayWithMeJS.Timestamp
-                })
-            }
-            )
-            console.log("[BiLive_PlayWithMeJS]", "尝试 第三方普通代签 请求 AppStart");
-            fetch(AppStartRequest).then(
-                res => {
-                    res.json().then(
-                        json => {
-                            BiLive_PlayWithMeJS.AppStartResponse = json;
-                            BiLive_PlayWithMeJS.AfterAppStart();
-                        })
-                }).then(
-                    BiLive_PlayWithMeJS.Test({
-                        "data": {
-                            "fans_medal_level": 21,
-                            "fans_medal_name": "官方",
-                            "fans_medal_wearing_status": false,
-                            "guard_level": 0,
-                            "msg": "PlayWithMe：签名失败，接口不可用",
-                            "timestamp": 1655354216,
-                            "uid": 3102384,
-                            "uname": "猫裙少年泽远喵",
-                            "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
-                            "room_id": 4639581
-                        },
-                        "cmd": "LIVE_OPEN_PLATFORM_DM"
-                    })
-                );
-        } else {
-            let RequestBody = {
-                "app_id": BiLive_PlayWithMeJS.AppID,
-                "code": BiLive_PlayWithMeJS.AuthCode
-            };
-            let AppStartRequest = new Request(
-                "https://live-open.biliapi.com/v2/app/start", {
-                method: "POST",
-                headers: BiLive_PlayWithMeJS_Authorizer.LocalAuthorizer_GenerateAuthorizedHead(RequestBody),
-                body: JSON.stringify(RequestBody)
-            }
-            )
-            console.log("[BiLive_PlayWithMeJS]", "准备使用 APIv2 发起 AppStart 请求")
-            fetch(AppStartRequest).then(
-                res => {
-                    res.json().then(
-                        json => {
-                            BiLive_PlayWithMeJS.AppStartResponse = json;
-                            BiLive_PlayWithMeJS.AfterAppStart();
-                        }
-                    )
-                });
-        }
+        if (BiLive_PlayWithMeJS_Authorizer.Chk_JSONPAuthorizerServer()) BiLive_PlayWithMeJS.AppStart_JSONP()
+        else if (BiLive_PlayWithMeJS_Authorizer.Chk_SameOriginAuthorizerServer()) BiLive_PlayWithMeJS.AppStart_SameOrigin()
+        else BiLive_PlayWithMeJS.AppStart_Local()
     }
 
     static AfterAppStart() {
@@ -383,6 +291,107 @@ class BiLive_PlayWithMeJS {
      */
     static Test(JSON) {
         BiLive_PlayWithMeJS_WEBSocketClient.NewJSONMsg(JSON);
+    }
+
+
+    static AppStart_JSONP() {
+        // 使用JSONP方式获取签名授权进行连接
+        let Elmts = document.createElement('script');
+        Elmts.src = BiLive_PlayWithMeJS_Authorizer.JSONPAuthorizerServer + window.location.search + "&AppID=" + BiLive_PlayWithMeJS.AppID + "&PWMID=" + BiLive_PlayWithMeJS_Authorizer.PWMID;
+        document.body.appendChild(Elmts);
+        console.log("[BiLive_PlayWithMeJS]", "尝试 第三方JSONP代签 请求 AppStart");
+        Elmts.onload = (evt) => {
+            BiLive_PlayWithMeJS.AppStartResponse = PlayWithMe_AuthorizerProxyResponse;
+            BiLive_PlayWithMeJS.AfterAppStart();
+            evt.currentTarget.remove();
+        }
+        Elmts.onerror = (evt) => {
+            BiLive_PlayWithMeJS.Test({
+                "data": {
+                    "fans_medal_level": 21,
+                    "fans_medal_name": "官方",
+                    "fans_medal_wearing_status": false,
+                    "guard_level": 0,
+                    "msg": "PlayWithMe：JSONP代签失败，" + BiLive_PlayWithMeJS.AppStartResponse.msg,
+                    "timestamp": 1655354216,
+                    "uid": 3102384,
+                    "uname": "猫裙少年泽远喵",
+                    "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+                    "room_id": 4639581
+                },
+                "cmd": "LIVE_OPEN_PLATFORM_DM"
+            });
+            evt.currentTarget.remove();
+        }
+    }
+
+    static AppStart_SameOrigin() {
+        let AppStartRequest = new Request(
+            BiLive_PlayWithMeJS_Authorizer.SameOriginAuthorizerServer, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                AppID: BiLive_PlayWithMeJS.AppID,
+                PWMID: BiLive_PlayWithMeJS_Authorizer.PWMID,
+                Code: BiLive_PlayWithMeJS.AuthCode,
+                CodeSign: BiLive_PlayWithMeJS.CodeSign,
+                Mid: BiLive_PlayWithMeJS.MID,
+                Timestamp: BiLive_PlayWithMeJS.Timestamp
+            })
+        }
+        )
+        console.log("[BiLive_PlayWithMeJS]", "尝试 第三方普通代签 请求 AppStart");
+        fetch(AppStartRequest).then(
+            res => {
+                res.json().then(
+                    json => {
+                        BiLive_PlayWithMeJS.AppStartResponse = json;
+                        BiLive_PlayWithMeJS.AfterAppStart();
+                    })
+            }).then(
+                BiLive_PlayWithMeJS.Test({
+                    "data": {
+                        "fans_medal_level": 21,
+                        "fans_medal_name": "官方",
+                        "fans_medal_wearing_status": false,
+                        "guard_level": 0,
+                        "msg": "PlayWithMe：签名失败，接口不可用",
+                        "timestamp": 1655354216,
+                        "uid": 3102384,
+                        "uname": "猫裙少年泽远喵",
+                        "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+                        "room_id": 4639581
+                    },
+                    "cmd": "LIVE_OPEN_PLATFORM_DM"
+                })
+            );
+    }
+
+    static AppStart_Local() {
+        let RequestBody = {
+            "app_id": BiLive_PlayWithMeJS.AppID,
+            "code": BiLive_PlayWithMeJS.AuthCode
+        };
+        let AppStartRequest = new Request(
+            "https://live-open.biliapi.com/v2/app/start", {
+            method: "POST",
+            headers: BiLive_PlayWithMeJS_Authorizer.LocalAuthorizer_GenerateAuthorizedHead(RequestBody),
+            body: JSON.stringify(RequestBody)
+        }
+        )
+        console.log("[BiLive_PlayWithMeJS]", "准备使用 APIv2 发起 AppStart 请求")
+        fetch(AppStartRequest).then(
+            res => {
+                res.json().then(
+                    json => {
+                        BiLive_PlayWithMeJS.AppStartResponse = json;
+                        BiLive_PlayWithMeJS.AfterAppStart();
+                    }
+                )
+            });
     }
 }
 
