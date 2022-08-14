@@ -110,7 +110,7 @@
     }
     BiLive_PlayWithMeJS.NewDanmaku = (data) => {
         document.body.innerHTML +=
-            "<div>收到一条弹幕，触发事件BiLive_PlayWithMeJS.NewDanmaku，事件回调data内容如下<br/><pre>" + JSON.stringify(data, null, 4) + "</pre></div>";
+            "<div>收到 " + data.uname + " 的一条弹幕，触发事件BiLive_PlayWithMeJS.NewDanmaku，事件回调data内容如下<br/><pre>" + JSON.stringify(data, null, 4) + "</pre></div>";
     }
 
     // 绑定新礼物事件
@@ -189,6 +189,11 @@
     // 绑定SC撤回事件
     BiLive_PlayWithMeJS.DelSC = (data) => {
         document.body.innerHTML += "<div>有一条SC被紧急撤回，触发事件BiLive_PlayWithMeJS.DelSC，事件回调data内容如下<br/><pre>" + JSON.stringify(data, null, 4) + "</pre></div>";
+    }
+
+    // 开平长链的掉线处理
+    BiLive_PlayWithMeJS.WSClientDisconnect = () => {
+        document.body.innerHTML += "<div>因为网络故障开平长链掉线，触发事件BiLive_PlayWithMeJS.WSClientDisconnect</div>";
     }
 
     // 初始化PlayWithMe.js的WEBSocket监听

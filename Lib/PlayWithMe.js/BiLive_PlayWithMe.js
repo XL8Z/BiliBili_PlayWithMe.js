@@ -852,10 +852,10 @@ class BiLive_PlayWithMeJS_AuthDialog {
             text-align: center;\
             position: absolute;\
             width: 5rem;\
-            height: 2.1rem;\
+            height: 2rem;\
             line-height: 2rem;\
             top: 30%;\
-            left: calc(36% - 5rem);\
+            left: calc(38% - 5rem);\
             margin: 0;\
         }\
         \
@@ -869,8 +869,8 @@ class BiLive_PlayWithMeJS_AuthDialog {
             height: 2rem;\
             line-height: 2rem;\
             top: 30%;\
-            left: 36%;\
-            right: calc(36% - 5rem);\
+            left: 38%;\
+            width: 40%;\
         }\
         \
         #div_PlayWithMeJS_AuthDialog_Dialog>h4 {\

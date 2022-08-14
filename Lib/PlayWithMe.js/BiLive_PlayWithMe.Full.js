@@ -143,6 +143,12 @@ class BiLive_PlayWithMeJS {
      */
     static DelSC(Msg) { };
 
+    /**
+     * 开平长链掉线事件
+     * @param {*} Evt
+     */
+    static WSClientDisconnect(Evt) { };
+
 
     /**
      * 请求AppStart后得到的授权数据
@@ -410,13 +416,14 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
             this.Login();
         }
 
-
         // 长链接收到数据后进行处理
         this.onmessage = (msg) => {
-            let Reader = new FileReader();
-            Reader.onloadend = (rdr) => this.NewPkg(new Uint8Array(rdr.currentTarget.result));
-            Reader.readAsArrayBuffer(msg.data);
+            let WSReader = new FileReader();
+            WSReader.onloadend = (rdr) => this.NewPkg(new Uint8Array(rdr.currentTarget.result));
+            WSReader.readAsArrayBuffer(msg.data);
         }
+
+        this.onclose = (evt) => BiLive_PlayWithMeJS.WSClientDisconnect(evt);
 
     }
 
@@ -506,7 +513,7 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
         if (Pkg[7] < 2) {
             switch (Pkg[11]) {
                 case 3:
-                    console.log("[BiLive_PlayWithMeJS] [开平长链]", "收到服务器收到心跳包后的回执【服务器很傲娇的踹了回来】");
+                    console.debug("[BiLive_PlayWithMeJS] [开平长链]", "收到服务器收到心跳包后的回执【服务器很傲娇的踹了回来】");
                     break;
                 case 5:
                     // 服务器通知你有新事件发生，此包夹带事件JSON
@@ -924,10 +931,10 @@ class BiLive_PlayWithMeJS_AuthDialog {
             text-align: center;\
             position: absolute;\
             width: 5rem;\
-            height: 2.1rem;\
+            height: 2rem;\
             line-height: 2rem;\
             top: 30%;\
-            left: calc(36% - 5rem);\
+            left: calc(38% - 5rem);\
             margin: 0;\
         }\
         \
@@ -941,8 +948,8 @@ class BiLive_PlayWithMeJS_AuthDialog {
             height: 2rem;\
             line-height: 2rem;\
             top: 30%;\
-            left: 36%;\
-            right: calc(36% - 5rem);\
+            left: 38%;\
+            width: 40%;\
         }\
         \
         #div_PlayWithMeJS_AuthDialog_Dialog>h4 {\
