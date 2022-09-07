@@ -209,9 +209,20 @@ class BiLive_PlayWithMeJS {
      * - 如果说配置Key和代签就是瞄准，那这个方法就是开炮
      */
     static AppStart() {
-        if (BiLive_PlayWithMeJS_Authorizer.Chk_JSONPAuthorizerServer()) BiLive_PlayWithMeJS.AppStart_JSONP()
-        else if (BiLive_PlayWithMeJS_Authorizer.Chk_SameOriginAuthorizerServer()) BiLive_PlayWithMeJS.AppStart_SameOrigin()
+        // 如果 AppStartResponse 已经被初始化，则不请求签名
+        if (BiLive_PlayWithMeJS.AppStartResponse == null) {
+            // 如果有设置POST的服务器URL，则使用同源POST请求开发者签名与AppStart
+            if (BiLive_PlayWithMeJS_Authorizer.Chk_SameOriginAuthorizerServer())
+                BiLive_PlayWithMeJS.AppStart_SameOrigin()
+            // 如果有设置JSONP跨域代签，则使用跨域代签
+            else if (BiLive_PlayWithMeJS_Authorizer.Chk_JSONPAuthorizerServer())
+                BiLive_PlayWithMeJS.AppStart_JSONP()
+        } else {
+            // 如果HTML内已有<script>标签设定过BiLive_PlayWithMeJS.AppStartResponse，则直接进行后处理不再申请签名
+            BiLive_PlayWithMeJS.AfterAppStart();
+        }
     }
+
 
     static AfterAppStart() {
         if (BiLive_PlayWithMeJS.AppStartResponse.code == 0) {
