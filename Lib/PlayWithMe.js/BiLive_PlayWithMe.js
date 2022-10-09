@@ -894,12 +894,12 @@ class BiLive_PlayWithMeJS_AuthDialog {
             top: 40%;\
         }\
         \
-        .img_Bili_FootLogo {\
+        .Bili_FootLogo {\
             position: absolute;\
             left: 0;\
             bottom: 0;\
         }\
-        .img_Bili_Help {\
+        .Bili_Help {\
             vertical-align: top;\
             height: 3rem;\
         }\
