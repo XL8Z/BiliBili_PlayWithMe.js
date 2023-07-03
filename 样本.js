@@ -1,21 +1,58 @@
 开平长链 = {
     弹幕事件: {
         "data": {
-            "fans_medal_level": 21,
-            "fans_medal_name": "官方",
-            "fans_medal_wearing_status": false,
-            "guard_level": 0,
-            "msg": "你们谁扔个小心心呗",
-            "timestamp": 1650717881,
-            "uid": 3102384,
-            "uname": "猫裙少年泽远喵",
-            "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
-            "msg_id": "eb805544-0cf2-4688-bca1-88299e5344bf",
-            "room_id": 4639581
+            "dm_type": 0,// 弹幕类型，0普通，1纯表情，目前只有0和1
+            "emoji_img_url": "",// 如果是表情弹幕，这里会给出表情的图片
+            "fans_medal_level": 22,// 发弹幕者在当前直播间的粉丝团等级
+            "fans_medal_name": "Anti粉",// 当前直播间内的粉丝牌名字
+            "fans_medal_wearing_status": false,// 他是否佩戴了这个粉丝牌
+            "guard_level": 0,// 舰队等级
+            "msg": "喵喵喵喵喵",// 弹幕内容
+            "timestamp": 1672338197,// UNIX时间戳
+            "uid": 3102384,// 发弹幕用户的B站UID
+            "uname": "猫裙少年泽远喵",// 发弹幕用户的昵称
+            "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",// 头像，万恶的头像【Blivechat：谢谢脑瓜子已经在疼了】
+            "msg_id": "b706a698-1efc-4a70-a7d0-0ac41098e51b",// 一个随机生成的UUID，用于防重复，可以不管
+            "room_id": 4639581,// 该直播间的直播间ID
+            "type": "Danmaku",// 事件类型，备用
+            "user_tag": "Self"// 用户的特殊身份，目前只有Self=主播本人
         },
         "cmd": "LIVE_OPEN_PLATFORM_DM"
     },
-    礼物事件: {
+    礼物事件: [{
+        "data": {
+            "uid": 114439178,
+            "uname": "不忘韩文初心",
+            "uface": "http://i0.hdslb.com/bfs/face/ac28a32a3da668c443b4b27f39da7058837a6743.jpg",
+            "gift_id": 31036,
+            "gift_name": "小花花",
+            "gift_num": 1,
+            "price": 100,
+            "paid": true,
+            "fans_medal_level": 26,
+            "fans_medal_name": "Anti粉",
+            "fans_medal_wearing_status": true,
+            "guard_level": 0,
+            "timestamp": 1683118497,
+            "anchor_info": {
+                "uface": "https://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
+                "uid": 3102384,
+                "uname": "猫裙少年泽远喵"
+            },
+            "gift_icon": "https://s1.hdslb.com/bfs/live/8b40d0470890e7d573995383af8a8ae074d485d9.png",
+            "combo_gift": true,
+            "combo_info": {
+                "combo_base_num": 1,
+                "combo_count": 1,
+                "combo_id": "batch:gift:combo_id:147905439:3102384:31036:1683118497.2646",
+                "combo_timeout": 5
+            },
+            "msg_id": "c69e86ce-6931-4c55-bdaf-ba439fbb914b",
+            "room_id": 4639581
+        },
+        "cmd": "LIVE_OPEN_PLATFORM_SEND_GIFT"
+    },
+    {
         "data": {
             "uid": 114439178,
             "uname": "不忘韩文初心",
@@ -26,7 +63,7 @@
             "price": 0,
             "paid": false,
             "fans_medal_level": 25,
-            "fans_medal_name": "官方",
+            "fans_medal_name": "Anti粉",
             "guard_level": 3,
             "timestamp": 1650717898,
             "anchor_info": {
@@ -38,7 +75,7 @@
             "room_id": 4639581
         },
         "cmd": "LIVE_OPEN_PLATFORM_SEND_GIFT"
-    },
+    }],
     上舰事件: {
         "data": {
             "user_info": {
@@ -91,7 +128,7 @@ v2接口请求AppStart = {
     "message": "0",
     "request_id": "1534992646149816320",
     "data": {
-        // 主播的各种八卦信息，注意你是先有身份码才有房间号，防止通过房间号直接未经主播同意建立长链
+        // 主播的各种八卦信息，注意你是先有身份码才有房间号，防止通过房间号直接未经主播同意建立长链推送礼物
         "anchor_info": {
             "room_id": 4639581,
             "uface": "http://i0.hdslb.com/bfs/face/7ced8612a3f3ef10e7238ee22b4c6948d3f53139.jpg",
@@ -99,7 +136,7 @@ v2接口请求AppStart = {
             "uname": "猫裙少年泽远喵"
         },
         "game_info": {
-            // 开放平台互动游戏场次ID，如果你做插件可以不用管
+            // 开放平台互动游戏场次ID，如果你做插件可以暂时不用管
             "game_id": "93594bf8-70e0-4b30-a5e9-0d60c4e11e17"
         },
         "websocket_info": {

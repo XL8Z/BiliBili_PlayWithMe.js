@@ -450,9 +450,9 @@ class BiLive_PlayWithMeJS_WEBSocketClient extends WebSocket {
         PkgData.push.apply(PkgData, [
             // 【Packet Length】包长字节数(Byte)【每隔字节8个位(Bit)，即数组里的一个UInt8】
             // 4字节[Byte]长度的包总长度，后两个为实际长度的高位和低位
-            // 这里用了取巧的写法，毕竟字节码是一个Byte是0到255，所以用255直接进位
+            // 这里用了取巧的写法，毕竟字节码是一个Byte是0到255，所以用256直接进位
             // 至于前两位……你跟我说你能发个长度超过65535的包？
-            0, 0, PkgLength / 255, PkgLength % 255,
+            0, 0, PkgLength / 256, PkgLength % 256,
             // 【Header Length】数据包包头长度，固定16，写死写死！
             0, 16,
             // 【Version】协议版本1，0表示无加密，2是zlib压缩过的，开平长链里没有压缩过的数据
